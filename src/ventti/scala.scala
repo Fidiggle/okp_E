@@ -1,0 +1,5 @@
+package ventti
+
+class scala {
+  
+}

@@ -1,5 +1,5 @@
 package ventti
 
-class scala {
+class ventti {
   
 }

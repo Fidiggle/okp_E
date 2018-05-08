@@ -1,7 +1,12 @@
+//Yhden pelaajan ventti cli-käyttöliittymällä.
+//Copyright 2018 Juhani Vähä-Mäkilä & Eero Nirhamo. All Rights Reserved.
 package ventti
 import collection.mutable._
+import util.control.Breaks._
+import scala.io._
 import Kortti._
 
+//Staattisten muuttujien emulointiin.
 object Ventti{
   var dealersHand=new ListBuffer()
   var playersHand=new ListBuffer()
@@ -12,84 +17,121 @@ object Ventti{
 class Ventti {
   var jatka="k"
 
-  def isAce(kortti:Kortti):Boolean={
-    kortti.getValue()==1
-  }
-  def laske(x: Int, y: Int): Int = x + y
+	//Tarkistaa onko pelaajalla tai jakajalla ässä.
+	//Parametri: True mikäli pelaaja, False jos jakaja.
+	def hasAce(player:Boolean):Boolean={
+		if(player)
+			Ventti.playersHand.apply(0).getValue()==1 || Ventti.playersHand.apply(1).getValue()==1
+		else
+			Ventti.dealersHand.apply(0).getValue()==1 || Ventti.dealerHand.apply(1).getValue()==1
+	  }
+	def laske(x: Int, y: Int): Int = x + y
 
-  def cardValue(arvo:Int):Int= {
-    arvo match {
-      case arvo if arvo>10 =>10
-      case _  => arvo
-    }
-  }
+	//Palauttaa kortin oikean arvon, jotta laskeminen menisi oikein.
+	def cardValue(arvo:Int):Int= {
+	    arvo match {
+	      case arvo if arvo>10 =>10
+	      case _  => arvo
+	    }
+	  }
 
-  def printHands(first:Boolean)={
-      println("Jakaja sai kortit:")
-      if(first){
-  		println(Ventti.dealersHand.head.toString()+"[piilotettu]")
-   		println("Käden arvo: "+Ventti.dealersHand.apply(0).getValue())
-      }
-      else{
-         println(Ventti.dealersHand.toString())
-         println("Käden arvo: "+Ventti.valueOfHands(0))
-      }
-  	println()
-  	println("Sinä sait käden:")
-  	println(Ventti.playersHand.toString())
-  	println("Käden arvo: "+Ventti.valueOfHands(1))
-  }
-  /*
-  def pelaa()={
-    luoPakka()
-    println("Tervetuloa pelaamaan venttiä.")
-    println("Aluksi sinulle ja jakajalle jetaan kaksi korttia.")
-    dealers_hand.append(jaaKortti())
-  players_hand.append(jaaKortti())
-     dealers_hand.append(jaaKortti())
-  players_hand.append(jaaKortti())
-  Ventti.valueOfHands(0)=laske(cardValue(Ventti.dealersHand.apply(0).getValue()), cardValue(Ventti.dealersHand.apply(1).getValue()))
-    Ventti.valueOfHands(1)=laske(cardValue(playersHand.apply(0).getValue()),cardValue(playersHand.apply(1).getValue()))
-    printHands(true)
-println("Mitä haluat tehdä?")
-println("1) Yksi kortti lisää.")
-println("2) Jää tähän.")
-val input=scala.io.StdIn.readInt()
-if(input==1)
-  moreCards()
-  else
-    dealersTurn()
-}
-*/
-def askUser():Int={
-	println("Mitä haluat tehdä?")
-	println("1) Yksi kortti lisää.")
-	println("2) Jää tähän.")
-	print(": ")
-	scala.io.StdIn.readInt()
-}
-while(jatka=="k"){
-    println("Tervetuloa pelaamaan venttiä.")
-    println("Aluksi sinulle ja jakajalle jaetaan kaksi korttia.")
-	luoPakka()
-	firstDeal()
-	//TODO do something based on value of hand
-	printHands(true)
-	var input=askUser()
-	while(input==1) {
-	  moreCards()
-	  printHands(true)
-	  input=askUser()
+	def printHands(first:Boolean)={
+	      println("Jakaja sai kortit:")
+	      if(first){
+	  		println(Ventti.dealersHand.head.toString()+"[piilotettu]")
+	  		if(hasAce(false) && Ventti.dealersHand.head.getValue()==1)
+	   			println("Käden arvo: 1/11")
+	   		else
+	   			println("Käden arvo: "+cardValue(Ventti.dealersHand.apply(0).getValue()))
+	      }
+	      else{
+	         println(Ventti.dealersHand.toString())
+	         println("Käden arvo: "+Ventti.valueOfHands(0))
+	      }
+	  	println()
+	  	println("Sinä sait käden:")
+		println(Ventti.playersHand.toString())
+	  	if(hasAce(true) && Ventti.valueOfHands(1)<21)
+			println("Käden arvo: "+Ventti.valueOfHands(1)+"/"+Ventti.valueOfHands(1)+10)
+		else
+			println("Käden arvo: "+Ventti.valueOfHands(1))
+	  }
+
+	def askUser():Int={
+		println("Mitä haluat tehdä?")
+		println("1) Yksi kortti lisää.")
+		println("2) Jää tähän.")
+		print(": ")
+		StdIn.readInt()
+	}
+	//Pelin ensimmäinen jako.
+	def firstDeal()={
+		Ventti.dealersHand.append(jaaKortti())
+		Ventti.playersHand.append(jaaKortti())
+		Ventti.dealersHand.append(jaaKortti())
+		Ventti.playersHand.append(jaaKortti())
+	}
+	//Jakajan vuoro.
+	def dealersTurn()={
+		while(Ventti.valueOfHands(0)<17){
+			val kortti=jaaKortti()
+			Ventti.dealersHand.append(kortti)
+			Ventti.valueOfHands(0)+=cardValue(kortti.getValue())
 		}
-    dealersTurn()
-    printHands(false)
-    if(Ventti.valueOfHands(0)>=Ventti.valueOfHands(1))
-    	println("Jakaja voitti.")
-    else
-    	println("Sinä voitit.")
-    	println()
-	print("Haluatko pelata uudestaan? (k/e): ")
-	jatka=scala.io.StdIn.readLine()
-}
-
+	}
+	//Pelaaja ottaa uuden kortin.
+	def moreCards()={
+		val kortti=jaaKortti()
+		Ventti.playersHand.append(kortti)
+		Ventti.valueOfHands(1)+=cardValue(kortti.getValue())
+	}
+	def main(args: Array[String]) {
+		//Itse pelin looppi.
+		while(jatka=="k"){
+    		println("Tervetuloa pelaamaan venttiä.")
+    		println("Aluksi sinulle ja jakajalle jaetaan kaksi korttia.")
+    		println("Tarkoitus on päästä mahdollisimman lähelle 21:tä kuitenkaan ylittämättä sitä.")
+    		println("Kortit J, Q ja K ovat arvoltaan 10, ässä joko 1 tai 11, muut kortit ovat arvonsa mukaisia.")
+			luoPakka()
+			firstDeal()
+			Ventti.valueOfHands(0)=laske(cardValue(Ventti.dealersHand.apply(0).getValue()), cardValue(Ventti.dealersHand.apply(1).getValue()))
+    		Ventti.valueOfHands(1)=laske(cardValue(playersHand.apply(0).getValue()),cardValue(playersHand.apply(1).getValue()))
+			printHands(true)
+			if(Ventti.valueOfHands(0)+10==21 || Ventti.valueOfHands(1)+10==21){
+					if(Ventti.valueOfHands(0)+10==21){
+						println("Jakaja voitti.")
+						}
+					else{
+						println("Sinä voitit.")
+						}
+				}
+				else{
+					var input=askUser()
+					while(input==1) {
+						moreCards()
+						printHands(true)
+						println()
+						input=askUser()
+						}
+				if(Ventti.valueOfHands(1)>21){
+					println("Sinä hävisit.")
+					}
+			    	else {
+			    		dealersTurn()
+			       		printHands(false)
+    					if(Ventti.valueOfHands(0)>=Ventti.valueOfHands(1)){
+    						println("Jakaja voitti.")
+    						println()
+    						}
+    					else{
+    						println("Sinä voitit.")
+    						println()
+    						}
+    					}
+				print("Haluatko pelata uudestaan? (k/e): ")
+				jatka=StdIn.readLine()
+				println()
+				}
+		}
+	}
 }

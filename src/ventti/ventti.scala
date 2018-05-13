@@ -4,13 +4,13 @@ package ventti
 import collection.mutable._
 import util.control.Breaks._
 import scala.io._
-import Kortti._
+import scala.util.Random
 
 //Staattisten muuttujien emulointiin.
-object Ventti{
-  var dealersHand=new ListBuffer()
-  var playersHand=new ListBuffer()
-  var deck=new ListBuffer()
+object Ventti extends App {
+  var dealersHand=new ListBuffer[Kortti]()
+  var playersHand=new ListBuffer[Kortti]()
+  var deck=new ListBuffer[Kortti]()
   var valueOfHands=Array(0,0) //alkio 0==jakaja, alkio 1==pelaaja
 }
 
@@ -21,9 +21,9 @@ class Ventti {
 	//Parametri: True mikäli pelaaja, False jos jakaja.
 	def hasAce(player:Boolean):Boolean={
 		if(player)
-			Ventti.playersHand.apply(0).getValue()==1 || Ventti.playersHand.apply(1).getValue()==1
+			Ventti.playersHand.apply(0).getValue==1 || Ventti.playersHand.apply(1).getValue==1
 		else
-			Ventti.dealersHand.apply(0).getValue()==1 || Ventti.dealerHand.apply(1).getValue()==1
+			Ventti.dealersHand.apply(0).getValue==1 || Ventti.dealersHand.apply(1).getValue==1
 	  }
 	def laske(x: Int, y: Int): Int = x + y
 
@@ -39,10 +39,10 @@ class Ventti {
 	      println("Jakaja sai kortit:")
 	      if(first){
 	  		println(Ventti.dealersHand.head.toString()+"[piilotettu]")
-	  		if(hasAce(false) && Ventti.dealersHand.head.getValue()==1)
+	  		if(hasAce(false) && Ventti.dealersHand.head.getValue==1)
 	   			println("Käden arvo: 1/11")
 	   		else
-	   			println("Käden arvo: "+cardValue(Ventti.dealersHand.apply(0).getValue()))
+	   			println("Käden arvo: "+cardValue(Ventti.dealersHand.apply(0).getValue))
 	      }
 	      else{
 	         println(Ventti.dealersHand.toString())
@@ -76,14 +76,31 @@ class Ventti {
 		while(Ventti.valueOfHands(0)<17){
 			val kortti=jaaKortti()
 			Ventti.dealersHand.append(kortti)
-			Ventti.valueOfHands(0)+=cardValue(kortti.getValue())
+			Ventti.valueOfHands(0)+=cardValue(kortti.getValue)
 		}
+	}
+	//Pakan luominen.
+	def luoPakka(): Unit ={
+		Ventti.deck.clear()
+		val maat = List[String] ("♠","♥","♦","♣")
+		for(i <- 1 to 13){
+			for(maa <- maat){
+				Ventti.deck += new Kortti(i,maa)
+			}
+		}
+		Random.shuffle(Ventti.deck)
+	}
+	//Kortin jakaminen pakasta
+	def jaaKortti(): Kortti ={
+		var topdeck = Ventti.deck.head
+		Ventti.deck.remove(0)
+		topdeck
 	}
 	//Pelaaja ottaa uuden kortin.
 	def moreCards()={
 		val kortti=jaaKortti()
 		Ventti.playersHand.append(kortti)
-		Ventti.valueOfHands(1)+=cardValue(kortti.getValue())
+		Ventti.valueOfHands(1)+=cardValue(kortti.getValue)
 	}
 	def main(args: Array[String]) {
 		//Itse pelin looppi.
@@ -94,8 +111,8 @@ class Ventti {
     		println("Kortit J, Q ja K ovat arvoltaan 10, ässä joko 1 tai 11, muut kortit ovat arvonsa mukaisia.")
 			luoPakka()
 			firstDeal()
-			Ventti.valueOfHands(0)=laske(cardValue(Ventti.dealersHand.apply(0).getValue()), cardValue(Ventti.dealersHand.apply(1).getValue()))
-    		Ventti.valueOfHands(1)=laske(cardValue(playersHand.apply(0).getValue()),cardValue(playersHand.apply(1).getValue()))
+			Ventti.valueOfHands(0)=laske(cardValue(Ventti.dealersHand.apply(0).getValue), cardValue(Ventti.dealersHand.apply(1).getValue) )
+				Ventti.valueOfHands(1)=laske(cardValue(Ventti.playersHand.apply(0).getValue),cardValue(Ventti.playersHand.apply(1).getValue))
 			printHands(true)
 			if(Ventti.valueOfHands(0)+10==21 || Ventti.valueOfHands(1)+10==21){
 					if(Ventti.valueOfHands(0)+10==21){

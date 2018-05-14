@@ -90,7 +90,7 @@ object Ventti extends App{
 				Peli.deck += new Kortti(i,maa)
 			}
 		}
-		Random.shuffle(Peli.deck)
+		Peli.deck=Random.shuffle(Peli.deck)
 	}
 	//Kortin jakaminen pakasta
 	def jaaKortti(): Kortti ={

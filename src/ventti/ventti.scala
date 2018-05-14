@@ -1,9 +1,9 @@
 //Yhden pelaajan ventti cli-käyttöliittymällä.
 //Copyright 2018 Juhani Vähä-Mäkilä & Eero Nirhamo. All Rights Reserved.
 package ventti
-import collection.mutable._
-import util.control.Breaks._
-import scala.io._
+
+import scala.collection.mutable.ListBuffer
+import scala.io.StdIn
 import scala.util.Random
 
 //Staattisten muuttujien emulointiin.

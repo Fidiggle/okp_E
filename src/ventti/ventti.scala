@@ -7,7 +7,7 @@ import scala.io._
 import scala.util.Random
 
 //Staattisten muuttujien emulointiin.
-object Ventti extends App {
+object Ventti {
   var dealersHand=new ListBuffer[Kortti]()
   var playersHand=new ListBuffer[Kortti]()
   var deck=new ListBuffer[Kortti]()

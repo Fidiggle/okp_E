@@ -53,8 +53,8 @@ object Ventti extends App{
 	  	println()
 	  	println("Sinä sait käden:")
 		println(Peli.playersHand.toString())
-	  	if(hasAce(true) && Peli.valueOfHands(1)<21)
-			println("Käden arvo: "+Peli.valueOfHands(1)+"/"+Peli.valueOfHands(1)+10)
+	  	if((hasAce(true) && Peli.valueOfHands(1)<21) && Peli.playersHand.size<=2)
+			println("Käden arvo: "+Peli.valueOfHands(1)+"/"+Integer.toString(Peli.valueOfHands(1)+10))
 		else
 			println("Käden arvo: "+Peli.valueOfHands(1))
 	  }
@@ -104,10 +104,12 @@ object Ventti extends App{
 		Peli.playersHand.append(kortti)
 		Peli.valueOfHands(1)+=cardValue(kortti.getValue)
 	}
-		def pelaa()={
+	def pelaa()={
 		var jatka="k"
 		//Itse pelin looppi.
 		while(jatka=="k"){
+		  Peli.playersHand.clear()
+		  Peli.dealersHand.clear()
     		println("Tervetuloa pelaamaan venttiä.")
     		println("Aluksi sinulle ja jakajalle jaetaan kaksi korttia.")
     		println("Tarkoitus on päästä mahdollisimman lähelle 21:tä kuitenkaan ylittämättä sitä.")
@@ -127,11 +129,15 @@ object Ventti extends App{
 				}
 				else{
 					var input=askUser()
-					while(input==1) {
+					while(input==1 && Peli.valueOfHands(1)<=21) {
 						moreCards()
 						printHands(true)
 						println()
-						input=askUser()
+						if(Peli.valueOfHands(1)>=21)
+							input=2
+						else
+							input=askUser()
+
 						}
 				if(Peli.valueOfHands(1)>21){
 					println("Sinä hävisit.")

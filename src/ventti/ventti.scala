@@ -114,6 +114,7 @@ object Ventti extends App{
     		println("Aluksi sinulle ja jakajalle jaetaan kaksi korttia.")
     		println("Tarkoitus on päästä mahdollisimman lähelle 21:tä kuitenkaan ylittämättä sitä.")
     		println("Kortit J, Q ja K ovat arvoltaan 10, ässä joko 1 tai 11, muut kortit ovat arvonsa mukaisia.")
+		println("")
 			luoPakka()
 			firstDeal()
 			Peli.valueOfHands(0)=laske(cardValue(Peli.dealersHand.apply(0).getValue), cardValue(Peli.dealersHand.apply(1).getValue) )

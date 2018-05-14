@@ -4,15 +4,15 @@ class Kortti(var arvo: Int, var maa: String){
   def getValue = arvo
 
   override def toString: String = {
-    if (this.getValue == 1)
-      s"($maa, Ässä)"
-    if (this.getValue == 11)
-      s"($maa, Jätkä)"
-    if (this.getValue == 12)
-      s"($maa, Rouva)"
-    if (this.getValue == 13)
-      s"($maa, Kuningas)"
+    if (arvo == 1)
+      s"[$maa A]"
+    else if (arvo == 11)
+      s"[$maa J]"
+    else if (arvo == 12)
+      s"[$maa Q]"
+    else if (arvo == 13)
+      s"[$maa K]"
     else
-      s"($maa, ,$arvo)"
+      s"[$maa $arvo]"
   }
 }
